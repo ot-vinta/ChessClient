@@ -58,6 +58,11 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
+.idea/
+.vs/
+
 # Crashlytics generated file
 crashlytics-build.properties
 
+
+ProjectSettings/ProjectVersion.txt
