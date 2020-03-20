@@ -1,5 +1,6 @@
 ﻿using models;
 using service;
+using service.server_connectors;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,7 +27,7 @@ public class TestConnection : MonoBehaviour
         m_ResponseText = GameObject.Find("ResponseText");
         
         m_SignInButton.GetComponent<Button>().onClick.AddListener(TaskLogIn);
-        m_SignUpButton.GetComponent<Button>().onClick.AddListener(TaskSignUp);
+        m_SignUpButton.GetComponent<Button>().onClick.AddListener(TaskRegister);
         m_QuitButton.GetComponent<Button>().onClick.AddListener(TaskCloseApp);
     }
 
@@ -41,7 +42,7 @@ public class TestConnection : MonoBehaviour
             m_ResponseText.GetComponent<Text>().text = "Wrong login or password.";
     }
 
-    private void TaskSignUp()
+    private void TaskRegister()
     {
         var result = UserConnector.SignUp(InitUser());
         m_ResponseText.GetComponent<Text>().text = result;

@@ -9,7 +9,7 @@ namespace utils
         private readonly NetworkStream m_Stream;
 
         private static NetClient _instance;
-        private const string Address = "127.0.0.1";
+        private const string Address = "https://chess-strange-server.herokuapp.com";
         private const int Port = 9116;
 
         private NetClient()
