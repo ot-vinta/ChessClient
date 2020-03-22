@@ -2,37 +2,46 @@
 using System.Collections.Generic;
 using models;
 using service.server_connectors;
+using UIBoxes;
 using UnityEngine;
 using UnityEngine.UI;
+using utils;
 
 public class MainMenuControls : MonoBehaviour
 {
-    private GameObject _newGameButton;
-    private GameObject _loadGameButton;
-    private GameObject _loginButton;
-    private GameObject _registerButton;
+    private static Button _newGameButton;
+    private static Button _loadGameButton;
+    private Button _loginButton;
+    private Button _registerButton;
 
-    private GameObject _responseText;
+    private static GameObject _responseText;
 
-
-    // Start is called before the first frame update
+    private GameObject _mainMenu;
+    private LoginBox _loginDialog;
+    private RegisterBox _registerDialog;
+    
     void Start()
     {
-        _newGameButton = GameObject.Find("NewGameButton");
-        _loadGameButton = GameObject.Find("LoadGameButton");
-        _loginButton = GameObject.Find("LoginButton");
-        _registerButton = GameObject.Find("RegisterButton");
+        NetClient.GetInstance();
+        _newGameButton = GameObject.Find("NewGameButton").GetComponent<Button>();
+        _loadGameButton = GameObject.Find("LoadGameButton").GetComponent<Button>();
+        _loginButton = GameObject.Find("LoginButton").GetComponent<Button>();
+        _registerButton = GameObject.Find("RegisterButton").GetComponent<Button>();
         
         _responseText = GameObject.Find("ResponseText");
         
-        _newGameButton.GetComponent<Button>().onClick.AddListener(TaskNewGame);
-        _newGameButton.GetComponent<Button>().enabled = false;
+        _mainMenu = GameObject.Find("MainMenu");
+        _loginDialog = new LoginBox();
+        _registerDialog = new RegisterBox();
+
+        _newGameButton.onClick.AddListener(TaskNewGame);
+        _newGameButton.enabled = false;
         
-        _loadGameButton.GetComponent<Button>().onClick.AddListener(TaskLoadGame);
-        _loadGameButton.GetComponent<Button>().enabled = false;
+        _loadGameButton.onClick.AddListener(TaskLoadGame);
+        _loadGameButton.enabled = false;
         
-        _loginButton.GetComponent<Button>().onClick.AddListener(TaskLogin);
-        _registerButton.GetComponent<Button>().onClick.AddListener(TaskRegister);
+        _loginButton.onClick.AddListener(OnLoginClicked);
+        _registerButton.onClick.AddListener(OnRegisterClicked);
     }
 
     private void TaskNewGame()
@@ -45,29 +54,21 @@ public class MainMenuControls : MonoBehaviour
         
     }
 
-    private void TaskLogin()
+    private void OnLoginClicked()
     {
-        var result = UserConnector.LogIn(InitUser());
-
-        if (result == "true")
-            _responseText.GetComponent<Text>().text =
-                "Hello, " + _loginField.transform.Find("Text").GetComponent<Text>().text;
-        else
-            _responseText.GetComponent<Text>().text = "Wrong login or password.";
-    }
-
-    private void TaskRegister()
-    {
-        var result = UserConnector.SignUp(InitUser());
-        _responseText.GetComponent<Text>().text = result;
+        _loginDialog.ShowBox();
     }
     
-    private User InitUser()
+    private void OnRegisterClicked()
     {
-        var login    = _loginField.transform.Find("Text").GetComponent<Text>().text;
-        var password = _passwordField.transform.Find("Text").GetComponent<Text>().text;
-                
-        var user = new User(login, password);
-        return user;
+        _registerDialog.ShowBox();
+    }
+
+    public static void OnLoggedIn(string login)
+    {
+        _responseText.GetComponent<Text>().text = "Hello, " + login + "!";
+
+        _newGameButton.enabled = true;
+        _loadGameButton.enabled = true;
     }
 }

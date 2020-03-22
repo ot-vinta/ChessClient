@@ -53,7 +53,8 @@ namespace utils
         public string GetMessage()
         {
             ArraySegment<byte> receiveData = new ArraySegment<byte>(new byte[4096]);
-
+            
+            Debug.Log(_client.State);
             Task<WebSocketReceiveResult> result = _client.ReceiveAsync(receiveData, Cts.Token);
             
             return Encoding.UTF8.GetString(receiveData.Array, 0, result.Result.Count);

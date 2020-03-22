@@ -5,31 +5,19 @@ using utils;
 
 namespace service.server_connectors
 {
-    public class UserConnector : MonoBehaviour
+    public static class UserConnector
     {
-        private string sendMessage;
-        private Message<string> receivedMessage;
+        private static readonly NetClient Client = NetClient.GetInstance();
 
-        private NetClient _client;
-
-        void Start()
+        public static string Register(User user)
         {
-            _client = NetClient.GetInstance();
-        }
-
-        public string Register(User user)
-        {
-            var message = new Message<User>("Register", user);
-
-            sendMessage = JsonUtility.ToJson(message);
-
-            StartCoroutine(nameof(SendAndReceiveMessage));
-            Debug.Log(receivedMessage);
-
+            var sendMessage = JsonUtility.ToJson(new Message<User>("Register", user));
+            var receivedMessage = JsonUtility.FromJson<Message<string>>(SendAndReceiveMessage(sendMessage));
+            
             switch (receivedMessage.command)
             {
                 case "SignUpResult":
-                    return "Success!";
+                    return "Success";
                 case "ErrorResult":
                     return receivedMessage.argument;
             }
@@ -37,38 +25,34 @@ namespace service.server_connectors
             return "Upps! Smth went wrong.";
         }
 
-        public string LogIn(User user)
+        public static string LogIn(User user)
         {
             var message = new Message<User>("Login", user);
 
-            sendMessage = JsonUtility.ToJson(message);
+            var sendMessage = JsonUtility.ToJson(message);
 
-            StartCoroutine(nameof(SendAndReceiveMessage));
+            var receivedMessage = JsonUtility.FromJson<Message<string>>(SendAndReceiveMessage(sendMessage));
 
             if (receivedMessage.command == "LogInResult")
-                return receivedMessage.argument;
+                return user.login;
             return "false";
         }
 
-        public void Disconnect()
+        public static void Disconnect()
         {
             var message = new Message<string>("CloseConnection", "");
 
-            sendMessage = JsonUtility.ToJson(message);
-
-            StartCoroutine(nameof(SendAndReceiveMessage));
-            Debug.Log(receivedMessage);
+            var sendMessage = JsonUtility.ToJson(message);
+            SendAndReceiveMessage(sendMessage);
         }
 
-        private IEnumerator SendAndReceiveMessage()
+        private static string SendAndReceiveMessage(string sendMessage)
         {
-            _client.SendMessage(sendMessage);
+            Client.SendMessage(sendMessage);
 
-            var result = _client.GetMessage();
+            var result = Client.GetMessage();
 
-            receivedMessage = JsonUtility.FromJson<Message<string>>(result);
-
-            yield return null;
+            return result;
         }
     }
 }
