@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using models;
 using service;
+using service.server_connectors;
 using UnityEngine;
 using UnityEngine.UI;
 using utils;
@@ -54,7 +55,7 @@ public class TestConnection : MonoBehaviour
             _mResponseText.GetComponent<Text>().text = "Wrong login or password.";
     }
 
-    private void TaskSignUp()
+    private void TaskRegister()
     {
         var result = _network.GetComponent<UserConnector>().Register(InitUser());
         _mResponseText.GetComponent<Text>().text = result;
