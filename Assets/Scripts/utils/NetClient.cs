@@ -1,29 +1,30 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace utils
 {
     class NetClient
     {
-        private readonly NetworkStream m_Stream;
-
         private static NetClient _instance;
-        private const string Address = "127.0.0.1";
-        private const int Port = 9116;
+        private static readonly Uri ServerUri = new Uri("ws://chess-strange-server.herokuapp.com/");
+        private static readonly CancellationTokenSource Cts = new CancellationTokenSource();
+        private readonly ClientWebSocket _client;
 
         private NetClient()
         {
             try
             {
-                var client = new TcpClient();
-                client.Connect(Address, Port);
-
-                m_Stream = client.GetStream();
+                _client = new ClientWebSocket();
+                _client.ConnectAsync(ServerUri, Cts.Token);
             }
             catch (SocketException e)
             {
-                Console.WriteLine("SocketException: {0}", e);
+                Debug.Log("SocketException: " + e);
             }
         }
 
@@ -39,22 +40,23 @@ namespace utils
         public void SendMessage(string text)
         {
             var sendData = Encoding.UTF8.GetBytes(text);
-
-            m_Stream.Write(sendData, 0, sendData.Length);
+            var sendBuffer = new ArraySegment<byte>(sendData);
+            
+            if (_client.State == WebSocketState.Open)
+                _client.SendAsync(
+                    sendBuffer, 
+                    WebSocketMessageType.Text,
+                    true, 
+                    Cts.Token);
         }
 
         public string GetMessage()
         {
-            var getData = new byte[4096];
-            var builder = new StringBuilder();
-            do
-            {
-                var bytes = m_Stream.Read(getData, 0, getData.Length);
-                builder.Append(Encoding.UTF8.GetString(getData, 0, bytes));
-            }
-            while (m_Stream.DataAvailable);
+            ArraySegment<byte> receiveData = new ArraySegment<byte>(new byte[4096]);
 
-            return builder.ToString();
+            Task<WebSocketReceiveResult> result = _client.ReceiveAsync(receiveData, Cts.Token);
+            
+            return Encoding.UTF8.GetString(receiveData.Array, 0, result.Result.Count);
         }
     }
 }
