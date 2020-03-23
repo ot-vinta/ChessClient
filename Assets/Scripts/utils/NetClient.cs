@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace utils
@@ -52,12 +51,20 @@ namespace utils
 
         public string GetMessage()
         {
-            ArraySegment<byte> receiveData = new ArraySegment<byte>(new byte[4096]);
+            var receiveData = new ArraySegment<byte>(new byte[4096]);
             
             Debug.Log(_client.State);
-            Task<WebSocketReceiveResult> result = _client.ReceiveAsync(receiveData, Cts.Token);
+            if (_client.State != WebSocketState.Open) return "Not opened state";
             
+            var result = _client.ReceiveAsync(receiveData, Cts.Token);
+
             return Encoding.UTF8.GetString(receiveData.Array, 0, result.Result.Count);
+
+        }
+
+        public WebSocketState GetConnectionStatus()
+        {
+            return _client.State;
         }
     }
 }
