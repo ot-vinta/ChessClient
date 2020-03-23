@@ -35,6 +35,7 @@ namespace service.server_connectors
 
             if (receivedMessage.command == "LogInResult")
                 return user.login;
+            Debug.Log(receivedMessage.argument);
             return "false";
         }
 

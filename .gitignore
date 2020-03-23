@@ -68,3 +68,11 @@ crashlytics-build.properties
 ProjectSettings/ProjectVersion.txt
 
 Assets/TempBlender/
+
+*.properties
+
+Assets/Resources/token.properties.meta
+
+Assets/Resources/token.txt
+
+Assets/Resources/token.txt.meta
