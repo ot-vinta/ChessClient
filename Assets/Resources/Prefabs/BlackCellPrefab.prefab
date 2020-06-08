@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1105884127883284863}
   - component: {fileID: 6657563427570068870}
   m_Layer: 0
-  m_Name: M_BaseChessField 1
+  m_Name: BlackCellPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
