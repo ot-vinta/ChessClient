@@ -23,10 +23,23 @@ public class DestroyChess : MonoBehaviour
         var position = gameObject.transform.position;
         var parent = gameObject.transform.parent;
         var prevRotation = gameObject.transform.rotation;
+        var material = gameObject.GetComponent<MeshRenderer>().material;
         var rotation = Quaternion.Euler(prevRotation.eulerAngles.x + 90, prevRotation.eulerAngles.y, prevRotation.eulerAngles.z);
-        var prefab = Resources.Load("Prefabs/BrokenPawn") as GameObject;
+        
+        var prefab = Resources.Load("Prefabs/Figures/BrokenPawn") as GameObject;
+        
+        AddMaterialToPrefab(material, prefab);
         
         Destroy(gameObject);
         Instantiate(prefab, position, rotation, parent);
+    }
+
+    private void AddMaterialToPrefab(Material material, GameObject prefab)
+    {
+        foreach (var child in prefab.GetComponentsInChildren<Transform>())
+            if (!child.gameObject.name.Contains("BrokenPawn"))
+            {
+                child.GetComponent<MeshRenderer>().material = material;
+            }
     }
 }
